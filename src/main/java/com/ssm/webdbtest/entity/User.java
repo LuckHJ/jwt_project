@@ -2,8 +2,10 @@ package com.ssm.webdbtest.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import org.springframework.data.annotation.Transient;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Collection;
 
@@ -31,10 +33,16 @@ public class User implements UserDetails {
     @TableField("credentials_non_expired")
     private boolean credentialsNonExpired;
 
+    @TableField("enabled")
     private boolean enabled;
-
+    @TableField(exist = false)
+    @Transient // authorities 不应直接映射到数据库字段
     private Collection<? extends GrantedAuthority> authorities;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
     // 必须保留无参构造函数
     public User() {}
 
@@ -53,11 +61,6 @@ public class User implements UserDetails {
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
         this.authorities = authorities;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
     }
 
     @Override

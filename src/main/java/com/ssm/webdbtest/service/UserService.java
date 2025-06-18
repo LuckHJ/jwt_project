@@ -11,4 +11,5 @@ public interface UserService{
     void updateUser(User user);
     void deleteUser(Long id);// 使用 MyBatis-Plus 的 removeById 方法删除实体
     void register(String username, String password, String email);
+    User loadUserWithAuthoritiesByUsername(Long id);
 }

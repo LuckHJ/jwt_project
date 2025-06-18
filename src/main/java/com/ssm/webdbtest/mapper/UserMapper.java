@@ -10,8 +10,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
     // 如果需要自定义 SQL 操作，可以在这里定义方法
-    @Select("Select password from user where id= #{id}")
-    String getPassword(Long id);
     @Select("Select * from user where username= #{userName}")
     User selectByUsername(String userName);
     //密码必须使用 BCryptPasswordEncoder 加密后再存储

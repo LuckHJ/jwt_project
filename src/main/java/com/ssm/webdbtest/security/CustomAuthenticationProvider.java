@@ -26,24 +26,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     //使用 passwordEncoder.matches(password, userDetails.getPassword()) 检查密码是否匹配。
     //如果匹配成功，创建并返回一个新的 UsernamePasswordAuthenticationToken 对象，包含用户信息和权限。
     //如果不匹配，抛出 BadCredentialsException 异常。
-    /*@Override
-    public Authentication authenticate(Authentication authentication) {
-        String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
-
-        UserDetails userDetails = myuserDetailsService.loadUserByUsername(username);
-
-        if (passwordEncoder.matches(password, userDetails.getPassword())) {
-
-            return new UsernamePasswordAuthenticationToken(
-                    userDetails.getUsername(),
-                    userDetails.getPassword(),
-                    userDetails.getAuthorities()
-            );
-        } else {
-            throw new BadCredentialsException("密码错误");
-        }
-    }*/
     @Override
     public Authentication authenticate(Authentication authentication) {
         String username = authentication.getName();
@@ -51,6 +33,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails userDetails = myuserDetailsService.loadUserByUsername(username);
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
+            System.out.print(userDetails.getAuthorities());
             return new UsernamePasswordAuthenticationToken(
                     userDetails,  // ✅ 改为传入整个 userDetails 对象
                     password,     // 原始凭证密码（通常不建议保存明文）

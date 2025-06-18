@@ -37,6 +37,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         //如果存在且以 "Bearer " 开头，则截取后面的 Token 字符串。
         if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
             String token = tokenHeader.substring(7);
+            if (jwtUtils.isBlacklisted(token)) {
+                SecurityContextHolder.clearContext();
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted");
+                return;
+            }
             String username = jwtUtils.extractUsername(token);
             //如果用户名非空，且当前线程未认证过（即没有 Authentication），则继续校验 Token。
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

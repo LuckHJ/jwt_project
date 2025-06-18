@@ -1,8 +1,12 @@
 package com.ssm.webdbtest.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ssm.webdbtest.entity.Role;
+import com.ssm.webdbtest.entity.UserRole;
+import com.ssm.webdbtest.mapper.RoleMapper;
 import com.ssm.webdbtest.mapper.UserMapper;
 import com.ssm.webdbtest.entity.User;
+import com.ssm.webdbtest.mapper.UserRoleMapper;
 import com.ssm.webdbtest.service.UserService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -11,8 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 //在执行更新、删除操作的方法上加上 @CacheEvict 注解，可以指定在方法执行后清除缓存。
 //如果你希望在更新数据库的同时更新缓存，可以使用 @CachePut 注解。
@@ -75,6 +84,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setCredentialsNonExpired(true);
         logger.info("baseMapper 类型: {}", baseMapper.getClass());
         save(user);
+    }
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+    @Autowired
+    private RoleMapper roleMapper;
+    @Override
+    public User loadUserWithAuthoritiesByUsername(Long id) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        List<Long> roleIds = userRoleMapper.selectList(null).stream()
+                .filter(ur -> ur.getUserId().equals(user.getId()))
+                .map(UserRole::getRoleId)
+                .toList();
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for (Long roleId : roleIds) {
+            Role role = roleMapper.selectById(roleId);
+            if (role != null) {
+                authorities.add(new SimpleGrantedAuthority(role.getName()));
+            }
+        }
+        user.setAuthorities(authorities);
+        return user;
     }
 }
 //MyBatis Plus 的 ServiceImpl<M extends BaseMapper<T>, T> 并没有提供 insert(T entity) 这个方法。它提供的是：

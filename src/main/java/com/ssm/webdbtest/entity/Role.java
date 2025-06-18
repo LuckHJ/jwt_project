@@ -1,12 +1,14 @@
 package com.ssm.webdbtest.entity;
-
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("user_role")
-public class UserRole {
-    private Long userId;
-    private Long roleId;
+@TableName("role")
+public class Role {
+
+    @TableId
+    private Long id;
+
+    private String name; // 角色名称，例如 "ROLE_ADMIN", "ROLE_USER"
 }

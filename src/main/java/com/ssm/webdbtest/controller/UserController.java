@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping("/FindUser/{id}")//http://localhost:8080/api/users/FindUser/
     public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+        return userService.loadUserWithAuthoritiesByUsername(id);
     }
 
     @PutMapping("/UpdateUser/{id}")//http://localhost:8080/api/users/UpdateUser/
